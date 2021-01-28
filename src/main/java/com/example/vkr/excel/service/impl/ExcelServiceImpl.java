@@ -161,7 +161,7 @@ public class ExcelServiceImpl implements ExcelService {
                         System.out.println(e.getMessage());
                     }
                     try {
-                        shipService.addShip(ship);
+                        shipService.save(ship);
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
                     }

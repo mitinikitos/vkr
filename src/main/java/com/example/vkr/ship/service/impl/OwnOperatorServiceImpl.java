@@ -1,32 +1,24 @@
 package com.example.vkr.ship.service.impl;
 
+import com.example.vkr.base.repository.BaseRepository;
+import com.example.vkr.base.service.impl.BaseServiceImpl;
 import com.example.vkr.ship.model.OwnOperator;
 import com.example.vkr.ship.service.OwnOperatorService;
 import com.example.vkr.ship.repository.OwnOperatorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.*;
 
-@Service
-public class OwnOperatorServiceImpl implements OwnOperatorService {
+@Service("ownOperatorService")
+public class OwnOperatorServiceImpl extends BaseServiceImpl<OwnOperator, String> implements OwnOperatorService {
 
-    @Autowired
+    @Resource(name = "ownOperatorRepository")
     OwnOperatorRepository ownOperatorRepository;
 
-    @Override
-    public void save(OwnOperator ownOperator) throws Exception {
-        ownOperatorRepository.save(ownOperator);
-    }
 
-    @Override
-    public List<OwnOperator> saveAll(List<OwnOperator> ownOperators) {
-
-        for (OwnOperator ownOperator : ownOperators) {
-            try {
-                ownOperatorRepository.save(ownOperator);
-            } catch (Exception ignored) {}
-        }
-        return null;
+    public OwnOperatorServiceImpl(BaseRepository<OwnOperator, String> baseRepository) {
+        super(baseRepository);
     }
 }

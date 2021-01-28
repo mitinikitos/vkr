@@ -1,6 +1,7 @@
 package com.example.vkr.ship.service.impl;
 
 import com.example.vkr.ship.model.Engine;
+import com.example.vkr.ship.service.EngineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -8,27 +9,12 @@ import javax.persistence.EntityManager;
 import java.util.*;
 
 @Service
-public class EngineServiceImpl implements com.example.vkr.ship.service.EngineService {
-
-
-    @Autowired
-    private EntityManager em;
-//    private JpaEntityInformation<Engine, ?> information;
-
-//    @Autowired
-//    public EngineServiceImpl(EntityManager em) {
-//        this.em = em;
-//        this.information = JpaEntityInformationSupport.getEntityInformation(Engine.class, em);
-//    }
-
+public class EngineServiceImpl implements EngineService {
 
     @Override
     public Engine save(Engine engine) {
         return null;
     }
-
-
-//
 
     @Override
 //    @Transactional
