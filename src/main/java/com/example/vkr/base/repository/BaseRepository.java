@@ -1,6 +1,6 @@
-package com.example.vkr.ship.repository;
+package com.example.vkr.base.repository;
 
-import com.example.vkr.exception.EntityExistsException;
+import com.example.vkr.exception.EntityNotFoundException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -17,4 +17,6 @@ public interface BaseRepository<T, ID> {
     List<T> findAll(Pageable pageable);
     List<T> findAll(@Nullable Specification<T> spec, Pageable pageable);
     Optional<T> findById(ID id);
+    void delete(T entity) throws EntityNotFoundException;
+    void deleteById(ID id) throws EntityNotFoundException;
 }

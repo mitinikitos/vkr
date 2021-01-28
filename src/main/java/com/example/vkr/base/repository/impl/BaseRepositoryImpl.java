@@ -1,7 +1,7 @@
-package com.example.vkr.ship.repository.impl;
+package com.example.vkr.base.repository.impl;
 
-import com.example.vkr.exception.EntityExistsException;
-import com.example.vkr.ship.repository.BaseRepository;
+import com.example.vkr.exception.EntityNotFoundException;
+import com.example.vkr.base.repository.BaseRepository;
 import lombok.NoArgsConstructor;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
+import org.springframework.data.util.ProxyUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -28,10 +29,9 @@ import java.util.Optional;
 
 import static org.springframework.data.jpa.repository.query.QueryUtils.toOrders;
 
-//@NoRepositoryBean
-@Repository
+
+@Repository("baseRepository")
 @NoArgsConstructor
-//@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class BaseRepositoryImpl<T, ID> implements BaseRepository<T, ID> {
 
     @PersistenceContext(unitName = "entityManagerFactory")
@@ -206,5 +206,39 @@ public class BaseRepositoryImpl<T, ID> implements BaseRepository<T, ID> {
         Class<T> domain = getDomainClass();
 
         return Optional.ofNullable(em.find(domain, id));
+    }
+
+
+    /**
+     * Delete entity
+     * @param entity must not be {@literal null}
+     */
+    @Override
+    public void delete(T entity) throws EntityNotFoundException {
+
+        Assert.notNull(entity, "Entity must not be null!");
+
+        Class<?> type = ProxyUtils.getUserClass(entity);
+
+        T existing = (T) em.find(type, information.getId(entity));
+
+        if (existing == null) {
+            throw new EntityNotFoundException(String.format("No %s entity exists!", getDomainClass()));
+        }
+
+        em.remove(em.contains(entity) ? entity : em.merge(entity));
+    }
+
+    /**
+     * Delete entity for the given {@link ID}
+     * @param id must not be {@literal null}.
+     */
+    @Override
+    public void deleteById(ID id) throws EntityNotFoundException {
+
+        Assert.notNull(id, "Id must not be null");
+
+        delete(findById(id).orElseThrow(() -> new EntityNotFoundException(
+                String.format("No %s entity with id %s!", getDomainClass(), id))));
     }
 }

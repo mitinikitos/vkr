@@ -12,4 +12,6 @@ public interface BaseService<T, ID> {
     T findById(ID id) throws EntityNotFoundException;
     List<T> findAll();
     List<T> findAll(Pageable pageable);
+    void delete(T entity) throws EntityNotFoundException;
+    void deleteById(ID id) throws EntityNotFoundException;
 }
