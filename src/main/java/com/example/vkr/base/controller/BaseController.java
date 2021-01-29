@@ -23,6 +23,10 @@ public abstract class BaseController<T, ID> {
 
     protected final BaseService<T, ID> service;
 
+    /**
+     * Creates {@link BaseController} for the given {@link BaseService}
+     * @param service must not be {@literal null}
+     */
     public BaseController(BaseService<T, ID> service) {
         this.service = service;
     }
@@ -30,6 +34,7 @@ public abstract class BaseController<T, ID> {
 
     /**
      * Return all entities
+     * @return {@link ResponseEntity#ok()}
      */
     @JsonView(View.UI.class)
     @GetMapping("/")
