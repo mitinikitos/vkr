@@ -47,10 +47,13 @@ public class ShipCapacity {
         this.nt = nt;
     }
 
-    public ShipCapacity(int regNum, @Nullable int dedv, @Nullable int passK,
-                        @Nullable int passP, @Nullable int gt, @Nullable int nt) {
-        this(dedv, passK, passP, gt, nt);
-        this.regNum = regNum;
+    /**
+     * Creates default {@link ShipCapacity} for the given {@link Ship}
+     * @param ship must not be {@literal null}
+     */
+    public ShipCapacity(Ship ship) {
+        this.regNum = ship.getId();
+        this.ship = ship;
     }
 
     public void setRegNum(Ship ship) {

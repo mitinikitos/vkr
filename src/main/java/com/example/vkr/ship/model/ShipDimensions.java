@@ -47,6 +47,15 @@ public class ShipDimensions {
         this.shipClass = shipClass;
     }
 
+    /**
+     * Creates default {@link ShipDimensions} for the given {@link Ship}
+     * @param ship must not be {@literal null}
+     */
+    public ShipDimensions(Ship ship) {
+        this.regNum = ship.getId();
+        this.ship = ship;
+    }
+
     public void setRegNum(Ship ship) {
         this.regNum = ship.getId();
         this.ship = ship;
