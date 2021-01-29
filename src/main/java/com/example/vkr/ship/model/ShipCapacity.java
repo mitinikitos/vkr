@@ -3,6 +3,7 @@ package com.example.vkr.ship.model;
 import com.example.vkr.util.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.sun.istack.Nullable;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,14 +12,17 @@ import javax.persistence.*;
 @Entity
 @Table(name = "ship_capacity")
 @Data
+@JsonView(View.UI.class)
 @NoArgsConstructor
+@AllArgsConstructor
 public class ShipCapacity {
 
     @Id
     @Column(name = "reg_num")
     private int regNum;
+    @Nullable
     @JsonView(View.REST.class)
-    @OneToOne(targetEntity = Ship.class)
+    @OneToOne(targetEntity = Ship.class, fetch = FetchType.LAZY)
     @PrimaryKeyJoinColumn(name = "reg_num", referencedColumnName = "reg_num")
     private Ship ship;
 
@@ -56,8 +60,8 @@ public class ShipCapacity {
         this.ship = ship;
     }
 
-    public void setRegNum(Ship ship) {
-        this.regNum = ship.getId();
-        this.ship = ship;
+    @Override
+    public String toString() {
+        return "[" + regNum + ", " + dedv + ", " + passK + ", " + passP + ", " + gt + ", " + nt + " ]";
     }
 }

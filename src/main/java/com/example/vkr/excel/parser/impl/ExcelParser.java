@@ -78,8 +78,10 @@ public class ExcelParser implements ParserBase<ParseModel> {
 
             ShipEngine shipEngine = new ShipEngine(ship, engines.get(0), engines.get(1), engines.get(2));
 
-            capacity.setRegNum(ship);
-            dimensions.setRegNum(ship);
+            capacity.setShip(ship);
+            capacity.setRegNum(ship.getId());
+            dimensions.setShip(ship);
+            dimensions.setRegNum(ship.getId());
 
 
 //            ship.setOwn(ownOperators.get(0));

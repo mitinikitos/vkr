@@ -55,9 +55,4 @@ public class ShipDimensions {
         this.regNum = ship.getId();
         this.ship = ship;
     }
-
-    public void setRegNum(Ship ship) {
-        this.regNum = ship.getId();
-        this.ship = ship;
-    }
 }

@@ -79,11 +79,6 @@ public class ShipEngine {
         sumPwr += engine3 == null ? 0 : engine3.getPwr() * engine3.getCount();
     }
 
-    public void setRegNum(Ship ship) {
-        this.regNum = ship.getId();
-        this.ship = ship;
-    }
-
     @Override
     public String toString() {
         return "ShipEngine [ " + regNum + ", " + sumPwr + " ]";
