@@ -1,97 +1,50 @@
 package com.example.vkr.ship.controller;
 
-import com.example.vkr.exception.BindingException;
-import com.example.vkr.exception.EntityExistsException;
-import com.example.vkr.exception.UnprocessableEntityException;
-import com.example.vkr.ship.service.ShipService;
-import com.example.vkr.exception.EntityNotFoundException;
+import com.example.vkr.base.controller.BaseController;
+import com.example.vkr.base.service.BaseService;
 import com.example.vkr.ship.model.Ship;
+import com.example.vkr.ship.service.ShipService;
 import com.example.vkr.util.View;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import javax.websocket.server.PathParam;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/ship")
 @JsonView(View.UI.class)
-public class ShipController {
+public class ShipController extends BaseController<Ship, Integer> {
 
     @Autowired
     private ShipService shipService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @JsonView(View.UI.class)
-    @GetMapping(value = "/{regNum}")
-    public ResponseEntity<Ship> read(@PathVariable("regNum") int regNum) throws EntityNotFoundException {
-
-        Optional<Ship> optionalShip = shipService.findById(regNum);
-        if (optionalShip.isEmpty()) {
-            throw new EntityNotFoundException("id-" + regNum);
-        }
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(optionalShip.get());
+    /**
+     * Creates {@link ShipController} for the given {@link BaseService}
+     * @param service must not be {@literal null}.
+     */
+    public ShipController(BaseService<Ship, Integer> service) {
+        super(service);
     }
 
-    @PostMapping("/addShips")
-    public ResponseEntity<?> addShips(@RequestBody @Valid List<Ship> ships) {
-        shipService.saveAll(ships);
-
-        return ResponseEntity.ok("");
-    }
-
-//    @PreAuthorize("hasRole('USER')")
-    @RequestMapping(value = "/addShip",
-            method = RequestMethod.POST,
-            headers = {"Content-type=application/json"})
-    @JsonView(View.UI.class)
-    public ResponseEntity<?> addShip(@RequestBody @Valid Ship ship, BindingResult bindingResult)
-            throws BindingException, EntityExistsException {
-
-        if (bindingResult.hasErrors()){
-            throw new BindingException("Error json");
-        }
-
-        Ship addShip = shipService.save(ship);
-
-        return ResponseEntity.status(201).body(addShip);
-    }
-
-//    @PreAuthorize("hasRole('USER')")
-    @DeleteMapping("/delete/{regNum}")
-    public ResponseEntity<?> deleteShip(@PathVariable("regNum") int regNum) throws EntityNotFoundException {
-        shipService.deleteById(regNum);
-        return ResponseEntity.ok().body("delete ship success");
-    }
-
-    @RequestMapping(value = "/ships",
-            params = {"page", "amount", "sort"},
+    /**
+     * @param page must not be {@literal null}. This is the offset of the query
+     * @param size must not be {@literal null}. This is the limit of the query
+     * @param sort must not be {@literal null}. This is type sort
+     * @return {@link List }
+     */
+    @RequestMapping(value = "",
+            params = {"page", "size", "sort"},
             method = RequestMethod.GET
     )
     public ResponseEntity<?> getShipsWithSort(@PathParam("page") int page,
-                                              @PathParam("amount") int amount,
+                                              @PathParam("size") int size,
                                               @PathParam("sort") String sort) {
-        List<Ship> shipPage = shipService.findAllWithSort(page, amount, sort);
+        List<Ship> shipPage = shipService.findAllWithSort(page, size, sort);
         return ResponseEntity.ok(shipPage);
-    }
-
-    @JsonView(View.UI.class)
-    @RequestMapping(value = "/allShip",
-            method = RequestMethod.GET,
-            headers = {"Content-type=application/json"})
-    public List<Ship> readAll() {
-        return shipService.findAll();
     }
 }
