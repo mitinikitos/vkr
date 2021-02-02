@@ -1,14 +1,13 @@
 package com.example.vkr.auth.repository;
 
 import com.example.vkr.auth.model.User;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import com.example.vkr.base.repository.BaseRepository;
+import org.springframework.data.repository.NoRepositoryBean;
 
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository
-public interface AuthRepository extends CrudRepository<User, UUID> {
+@NoRepositoryBean
+public interface AuthRepository extends BaseRepository<User, UUID> {
     Optional<User> findByUserName(String userName);
-    Optional<User> saveAndFlush(User user);
 }
