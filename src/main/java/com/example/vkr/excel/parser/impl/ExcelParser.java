@@ -64,17 +64,15 @@ public class ExcelParser implements ParserBase<ParseModel> {
             var ownOperatorsResult = futureOwnOperators.get();
 
             List<Engine> engines = enginesResult.getT();
-
             ShipCapacity capacity = capacityResult.getT();
             ShipDimensions dimensions = dimensionsResult.getT();
-
             List<OwnOperator> ownOperators = ownOperatorsResult.getT();
+
             Map<String, OwnOperator> ownOperatorMap = new HashMap<>();
             ownOperators.stream()
                     .filter(Objects::nonNull)
                     .forEach(ownOperator ->
                             ownOperatorMap.putIfAbsent(ownOperator.getName(), ownOperator));
-
 
             ShipEngine shipEngine = new ShipEngine(ship, engines.get(0), engines.get(1), engines.get(2));
 
@@ -84,32 +82,18 @@ public class ExcelParser implements ParserBase<ParseModel> {
             dimensions.setRegNum(ship.getId());
 
 
-//            ship.setOwn(ownOperators.get(0));
-            ship.setOwnName(ownOperators.get(0));
-//            ship.setOperator(ownOperators.get(1));
-            ship.setOperatorName(ownOperators.get(1));
+            ship.setOwn(ownOperators.get(0));
+            ship.setOperator(ownOperators.get(1));
             ship.setShipCapacity(capacity);
             ship.setShipDimensions(dimensions);
             ship.setShipEngine(shipEngine);
 
             err.append(capacityResult.getError()).append(dimensionsResult.getError());
-            ParseModel parseModel = new ParseModel(ship, engines, capacity, dimensions, ownOperatorMap);
+            ParseModel parseModel = new ParseModel(ship, ownOperatorMap);
             return new ParseResult<>(parseModel, err.toString());
-        } catch (ParseExcelException e) {
-            return new ParseResult<>(null, e.getMessage());
         } catch (Exception e) {
             return new ParseResult<>(null, e.getMessage());
         }
-//        finally {
-//            if (futureCapacity != null)
-//                futureCapacity.cancel(true);
-//            if (futureDimensions != null)
-//                futureDimensions.cancel(true);
-//            if (futureEngines != null)
-//                futureEngines.cancel(true);
-//            if (futureOwnOperators != null)
-//                futureOwnOperators.cancel(true);
-//        }
     }
 
     @Override

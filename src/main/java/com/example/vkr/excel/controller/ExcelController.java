@@ -21,21 +21,9 @@ public class ExcelController {
     @Autowired
     ExcelService excelService;
 
-    @GetMapping("/save")
-    public ResponseEntity<?> parseExcel() {
-        String fileName = "/home/nikita/Documents/ВКР/бд.xls";
-        File file = new File(fileName);
-
-        final long start = LocalTime.now().toNanoOfDay();
-        String resError = excelService.parse(file);
-        final long end = LocalTime.now().minusNanos(start).toNanoOfDay();
-        System.out.println(end);
-        return ResponseEntity.status(201).body(resError);
-    }
-
     @RequestMapping(value = "/save", method = RequestMethod.POST)
 //    @PostMapping("/save")
-    public ResponseEntity<String> parseExcel(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> parseExcel(@RequestParam("file") MultipartFile file) {
         if (!file.isEmpty()) {
             try {
                 InputStream inputStream = file.getInputStream();
@@ -46,7 +34,6 @@ public class ExcelController {
 
                 byte[] bytes = new byte[inputStream.available()];
 
-                file = null;
                 inputStream.read(bytes);
                 outputStream.write(bytes);
                 inputStream.close();
@@ -58,7 +45,7 @@ public class ExcelController {
                 return ResponseEntity.status(201).body(resError);
             } catch (IOException e) {
                 e.printStackTrace();
-                return new ResponseEntity("server errors", HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>("server errors", HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else
             return ResponseEntity.badRequest().body("");
