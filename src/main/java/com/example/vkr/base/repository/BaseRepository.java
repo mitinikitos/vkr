@@ -11,6 +11,12 @@ import java.util.Optional;
 
 @NoRepositoryBean
 public interface BaseRepository<T, ID> {
+    /**
+     * Save entity and flush
+     * @param <S> extends {@link T}
+     * @param entity must not be {@literal null}
+     * @return {@link S} if entity save
+     */
     <S extends T> S save(S entity);
     <S extends T> List<S> saveAll(List<S> entities);
     List<T> findAll();

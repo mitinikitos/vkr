@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +34,15 @@ public class BaseServiceImpl<T, ID> implements BaseService<T, ID> {
 
     @Override
     public <S extends T> List<S> saveAll(List<S> entities) {
-        return null;
+
+        List<S> res = new ArrayList<>();
+        for (S s : entities){
+            try {
+                S addedS = save(s);
+                res.add(addedS);
+            } catch (Exception ignored) {}
+        }
+        return res;
     }
 
     @Override

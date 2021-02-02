@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
@@ -26,6 +27,7 @@ public class ShipCapacityRepositoryImpl extends BaseRepositoryImpl<ShipCapacity,
     }
 
     @Override
+    @Transactional
     public <S extends ShipCapacity> S save(S entity) {
 
         Assert.notNull(entity, "Entity must not be null.");

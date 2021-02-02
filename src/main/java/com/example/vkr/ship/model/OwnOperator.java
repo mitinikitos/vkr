@@ -22,6 +22,7 @@ import java.util.Set;
                 typeClass = StringArrayType.class
         )
 })
+@JsonView(View.UI.class)
 @NoArgsConstructor
 public class OwnOperator {
 
@@ -44,12 +45,12 @@ public class OwnOperator {
     @Type(type = "string-array")
     private String[] fax;
 
-//    @JsonView(View.REST.class)
-//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "ship")
-//    private Set<Ship> shipsOwn;
-//    @JsonView(View.REST.class)
-//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "ship")
-//    private Set<Ship> shipsOperator;
+    @JsonView(View.REST.class)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "own")
+    private Set<Ship> shipsOwn;
+    @JsonView(View.REST.class)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "operator")
+    private Set<Ship> shipsOperator;
 
     public OwnOperator(String name, @Nullable String address, @Nullable String[] phones,
                        @Nullable String email, @Nullable String[] fax) {

@@ -9,10 +9,6 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.data.jpa.repository.support.JpaEntityInformation;
-import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
-import org.springframework.data.repository.core.EntityInformation;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -58,10 +54,6 @@ public class VkrJPAConfig {
         return barEntityManagerFactory().getObject();
     }
 
-//    @Bean
-//    public <T> JpaEntityInformation<T, ?> jpaEntityInformation(Class<T> clazz) {
-//        return JpaEntityInformationSupport.getEntityInformation(clazz, entityManager());
-//    }
 
     @Bean
     public LocalContainerEntityManagerFactoryBean barEntityManagerFactory() {

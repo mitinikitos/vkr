@@ -4,6 +4,7 @@ import com.example.vkr.base.controller.BaseController;
 import com.example.vkr.base.service.BaseService;
 import com.example.vkr.exception.BindingException;
 import com.example.vkr.exception.EntityExistsException;
+import com.example.vkr.exception.EntityNotFoundException;
 import com.example.vkr.ship.model.ShipCapacity;
 import com.example.vkr.ship.service.ShipCapacityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +35,14 @@ public class ShipCapacityController extends BaseController<ShipCapacity, Integer
     @RequestMapping(value = "/put",
             method = RequestMethod.PUT,
             headers = { "Content-type=application/json" })
-    @Override
-    public ResponseEntity<?> addEntity(@RequestBody @Valid ShipCapacity entity, BindingResult bindingResult)
-            throws BindingException, EntityExistsException {
-        System.out.println(entity.toString());
-        return super.addEntity(entity, bindingResult);
+    public ResponseEntity<?> updateEntity(@RequestBody @Valid ShipCapacity entity, BindingResult bindingResult)
+            throws BindingException, EntityNotFoundException {
+
+        if (bindingResult.hasErrors()) {
+            throw new BindingException("Json error");
+        }
+
+        ShipCapacity shipCapacity = shipCapacityService.update(entity);
+        return ResponseEntity.ok().body(shipCapacity);
     }
 }

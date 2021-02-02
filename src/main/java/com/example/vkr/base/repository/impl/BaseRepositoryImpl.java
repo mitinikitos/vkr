@@ -29,7 +29,6 @@ import java.util.Optional;
 
 import static org.springframework.data.jpa.repository.query.QueryUtils.toOrders;
 
-
 @Repository("baseRepository")
 @NoArgsConstructor
 public class BaseRepositoryImpl<T, ID> implements BaseRepository<T, ID> {
@@ -39,6 +38,10 @@ public class BaseRepositoryImpl<T, ID> implements BaseRepository<T, ID> {
 
     protected JpaEntityInformation<T, ?> information;
 
+    /**
+     * Creates a new {@link BaseRepositoryImpl} for the given {@link JpaEntityInformation}
+     * @param information must not be {@literal null}
+     */
     public BaseRepositoryImpl(JpaEntityInformation<T, ?> information) {
         this.information = information;
     }
@@ -75,6 +78,7 @@ public class BaseRepositoryImpl<T, ID> implements BaseRepository<T, ID> {
 
     /**
      * Creates {@link TypedQuery} for the given {@link Specification} and {@link Sort}
+     * @param <S> extends {@link T}
      * @param spec can be {@literal null}.
      * @param domainClass must not be {@literal null}.
      * @param sort must not be {@literal null}.
@@ -117,7 +121,11 @@ public class BaseRepositoryImpl<T, ID> implements BaseRepository<T, ID> {
 
         return root;
     }
-
+    /**
+     * Returns {@link Pageable#unpaged()} for the given {@link Pageable}
+     * @param pageable must not be {@literal null}.
+     * @return {@link Pageable#unpaged()}
+     */
     protected static boolean isUnpaged(Pageable pageable) {
         return pageable.isUnpaged();
     }
@@ -169,10 +177,6 @@ public class BaseRepositoryImpl<T, ID> implements BaseRepository<T, ID> {
         return query.getResultList();
     }
 
-    /**
-     * Save entity and flush
-     * @param entity must not be {@literal null}
-     */
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW,
             rollbackFor = { DataIntegrityViolationException.class, ConstraintViolationException.class })
@@ -205,15 +209,17 @@ public class BaseRepositoryImpl<T, ID> implements BaseRepository<T, ID> {
 
         Class<T> domain = getDomainClass();
 
-        return Optional.ofNullable(em.find(domain, id));
+        return Optional.ofNullable(em.getReference(domain, id));
     }
 
 
     /**
      * Delete entity
-     * @param entity must not be {@literal null}
+     * @param entity must not be {@literal null}.
+     * @exception EntityNotFoundException if entity not exists
      */
     @Override
+    @Transactional
     public void delete(T entity) throws EntityNotFoundException {
 
         Assert.notNull(entity, "Entity must not be null!");
@@ -232,8 +238,10 @@ public class BaseRepositoryImpl<T, ID> implements BaseRepository<T, ID> {
     /**
      * Delete entity for the given {@link ID}
      * @param id must not be {@literal null}.
+     * @exception EntityNotFoundException if entity for the given {@link ID} not exists.
      */
     @Override
+    @Transactional
     public void deleteById(ID id) throws EntityNotFoundException {
 
         Assert.notNull(id, "Id must not be null");

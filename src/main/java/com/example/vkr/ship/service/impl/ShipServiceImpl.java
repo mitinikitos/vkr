@@ -3,6 +3,7 @@ package com.example.vkr.ship.service.impl;
 import com.example.vkr.base.repository.BaseRepository;
 import com.example.vkr.base.service.impl.BaseServiceImpl;
 import com.example.vkr.exception.EntityExistsException;
+import com.example.vkr.exception.EntityNotFoundException;
 import com.example.vkr.ship.model.*;
 import com.example.vkr.ship.repository.ShipRepository;
 import com.example.vkr.ship.service.ShipService;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Optional;
 
 @Service("shipService")
 public class ShipServiceImpl extends BaseServiceImpl<Ship, Integer> implements ShipService {
@@ -30,26 +32,44 @@ public class ShipServiceImpl extends BaseServiceImpl<Ship, Integer> implements S
 
     @Override
     public <S extends Ship> S save(S ship) throws EntityExistsException {
-
-        if (ship.getShipEngine() == null) {
-            ShipEngine shipEngine = new ShipEngine(ship);
-            ship.setShipEngine(shipEngine);
+        if (ship.getShipCapacity() == null) {
+            ship.setShipCapacity(new ShipCapacity(ship));
         }
         if (ship.getShipDimensions() == null) {
-            ShipDimensions dimensions = new ShipDimensions(ship);
-            ship.setShipDimensions(dimensions);
+            ship.setShipDimensions(new ShipDimensions(ship));
         }
-        if (ship.getShipCapacity() == null) {
-            ShipCapacity capacity = new ShipCapacity(ship);
-            ship.setShipCapacity(capacity);
+        if (ship.getShipEngine() == null) {
+            ship.setShipEngine(new ShipEngine(ship));
         }
         return super.save(ship);
     }
 
-    //TODO добавить отдельный метод в repository
     @Override
     public List<Ship> findAllWithSort(int page, int size, String sort) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sort));
         return findAll(pageable);
+    }
+
+    //TODO
+    @Override
+    public ShipDto findByIdWithJoin(int id, boolean isCapacity, boolean isDimensions, boolean isEngines) throws EntityNotFoundException {
+
+        Optional<Ship> optionalShip = shipRepository.findById(id);
+
+        if (optionalShip.isEmpty()) {
+            throw new EntityNotFoundException(String.format("No ship entity with id %d", id));
+        }
+        Ship ship = optionalShip.get();
+        ShipDto shipDto = new ShipDto(ship);
+        if (isCapacity) {
+            shipDto.setShipCapacity(ship.getShipCapacity());
+        }
+        if (isDimensions) {
+            shipDto.setShipDimensions(ship.getShipDimensions());
+        }
+        if (isEngines) {
+            shipDto.setShipEngine(ship.getShipEngine());
+        }
+        return shipDto;
     }
 }

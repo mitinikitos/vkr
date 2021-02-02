@@ -1,6 +1,7 @@
 package com.example.vkr.ship.model;
 
 import com.example.vkr.util.View;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.sun.istack.Nullable;
 import lombok.Data;
@@ -12,6 +13,8 @@ import javax.persistence.*;
 @Table(name = "ship_dimensions")
 @Data
 @NoArgsConstructor
+@JsonView(View.UI.class)
+@JsonIgnoreProperties({"hibernateLazyInitializer"})
 public class ShipDimensions {
 
     @Id
@@ -38,6 +41,14 @@ public class ShipDimensions {
     @Column(name = "class")
     private String shipClass;
 
+    /**
+     * Creates {@link ShipDimensions}.
+     * @param disp can be {@literal null}.
+     * @param length can be {@literal null}.
+     * @param breadth can be {@literal null}.
+     * @param draught can be {@literal null}.
+     * @param shipClass can be {@literal null}.
+     */
     public ShipDimensions(@Nullable int disp, @Nullable double length, @Nullable double breadth,
                           @Nullable double draught, @Nullable String shipClass) {
         this.disp = disp;

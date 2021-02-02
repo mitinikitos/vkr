@@ -23,7 +23,7 @@ public class ShipParser extends ExcelParserBase implements ParserBase<Ship> {
             Integer godP = intParser(row.getCell(SHIP_INDEXS[7]));
             return new ParseResult<>(new Ship(regNum, name, type, subType, imo, callSign, project, godP), null);
         } catch (Exception e) {
-            return new ParseResult<>(null, "ошибка в parser ship " + row.getRowNum());
+            return new ParseResult<>(null, "error in parser ship " + row.getRowNum() + "\n");
         }
     }
 

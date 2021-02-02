@@ -2,15 +2,16 @@ package com.example.vkr.ship.controller;
 
 import com.example.vkr.base.controller.BaseController;
 import com.example.vkr.base.service.BaseService;
+import com.example.vkr.exception.EntityNotFoundException;
 import com.example.vkr.ship.model.Ship;
+import com.example.vkr.ship.model.ShipDto;
 import com.example.vkr.ship.service.ShipService;
 import com.example.vkr.util.View;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.sun.istack.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
 import java.util.List;
@@ -46,5 +47,18 @@ public class ShipController extends BaseController<Ship, Integer> {
                                               @PathParam("sort") String sort) {
         List<Ship> shipPage = shipService.findAllWithSort(page, size, sort);
         return ResponseEntity.ok(shipPage);
+    }
+
+    @JsonView(View.UI.class)
+    @GetMapping("/all/{id}")
+    public ResponseEntity<?> getShipWithJoin(
+            @PathVariable("id") int id,
+            @RequestParam(value = "capacity", required = false, defaultValue = "false") Boolean capacity,
+            @RequestParam(value = "dimensions", required = false, defaultValue = "false") Boolean dimensions,
+            @RequestParam(value = "engines", required = false, defaultValue = "false") Boolean engines)
+            throws EntityNotFoundException {
+
+        ShipDto shipDto = shipService.findByIdWithJoin(id, capacity, dimensions, engines);
+        return ResponseEntity.ok().body(shipDto);
     }
 }
