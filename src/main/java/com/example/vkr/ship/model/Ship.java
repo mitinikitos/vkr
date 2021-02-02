@@ -5,16 +5,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.sun.istack.Nullable;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.LazyToOne;
-import org.hibernate.annotations.LazyToOneOption;
-import org.hibernate.engine.spi.PersistentAttributeInterceptable;
 import org.hibernate.engine.spi.PersistentAttributeInterceptor;
 
 import javax.persistence.*;
 
+@SuppressWarnings("JavaDoc")
 @Entity
 @Table(name = "ship")
 @JsonView(View.UI.class)
@@ -39,7 +35,7 @@ public class Ship {
     private String subType;
     @Nullable
     @Column(name = "imo")
-    private int imo;
+    private Integer imo;
     @Nullable
     @Column(name = "call_sign")
     private String callSign;
@@ -47,8 +43,14 @@ public class Ship {
     @Column(name = "project")
     private String project;
     @Nullable
+    @Column(name = "port")
+    private String port;
+    @Nullable
+    @Column(name = "speed")
+    private Integer speed;
+    @Nullable
     @Column(name = "god_p")
-    private int godP;
+    private Integer godP;
 
     @Nullable
     @Column(name = "own_name")
@@ -83,8 +85,23 @@ public class Ship {
     @JsonView(View.REST.class)
     private ShipDimensions shipDimensions;
 
-    public Ship(int id, String name, @Nullable String type, @Nullable String subType,
-                @Nullable Integer imo, @Nullable String callSign, @Nullable String project, @Nullable Integer godP) {
+    /**
+     * Creates {@link Ship}
+     * @param id must not de {@literal null}
+     * @param name must not be {@literal null}
+     * @param type can be {@literal null}
+     * @param subType can be {@literal null}
+     * @param imo can be {@literal null}
+     * @param callSign can be {@literal null}
+     * @param project can be {@literal null}
+     * @param port can be {@literal null}
+     * @param godP can be {@literal null}
+     * @param speed can be {@literal null}
+     */
+    public Ship(int id, String name, @Nullable String type,
+                @Nullable String subType, @Nullable Integer imo, @Nullable String callSign,
+                @Nullable String project, @Nullable String port, @Nullable Integer godP,
+                @Nullable Integer speed) {
         this.id = id;
         this.name = name;
         this.type = type;
@@ -92,7 +109,9 @@ public class Ship {
         this.imo = imo;
         this.callSign = callSign;
         this.project = project;
+        this.port = port;
         this.godP = godP;
+        this.speed = speed;
     }
 
     /**
@@ -113,9 +132,16 @@ public class Ship {
         this.operatorName = operator == null ? null : operator.getName();
     }
 
-    //Тестовый конструктор
-    public Ship(int id, String name, int imo, int godP) {
-        this(id, name, null, null, imo, null, null, godP);
+    /**
+     * Creates {@link Ship} for test
+     * @param id must not be {@literal null}
+     * @param name must not be {@literal null}
+     * @param imo can be {@literal null}
+     * @param godP can be {@literal null}
+     */
+    public Ship(int id, String name,
+                @Nullable int imo, @Nullable int godP) {
+        this(id, name, null, null, imo, null, null, null, godP, null);
     }
 
     @Override

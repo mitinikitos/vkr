@@ -38,6 +38,9 @@ public class ShipDimensions {
     @Column(name = "draught")
     private double draught;
     @Nullable
+    @Column(name = "depth")
+    private double depth;
+    @Nullable
     @Column(name = "class")
     private String shipClass;
 
@@ -46,14 +49,16 @@ public class ShipDimensions {
      * @param disp can be {@literal null}.
      * @param length can be {@literal null}.
      * @param breadth can be {@literal null}.
+     * @param depth can be {@literal null}.
      * @param draught can be {@literal null}.
      * @param shipClass can be {@literal null}.
      */
     public ShipDimensions(@Nullable int disp, @Nullable double length, @Nullable double breadth,
-                          @Nullable double draught, @Nullable String shipClass) {
+                          @Nullable double depth, @Nullable double draught, @Nullable String shipClass) {
         this.disp = disp;
         this.length = length;
         this.breadth = breadth;
+        this.depth = depth;
         this.draught = draught;
         this.shipClass = shipClass;
     }
