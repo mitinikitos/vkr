@@ -9,15 +9,10 @@ import org.apache.poi.ss.usermodel.Row;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 @Service("excelParser")
 public class ExcelParser implements ParserBase<ParseModel> {
@@ -33,15 +28,15 @@ public class ExcelParser implements ParserBase<ParseModel> {
     @Resource(name = "dimensionsParser")
     private ParserBase<ShipDimensions> dimensionsParser;
 
-    private ExecutorService ex = Executors.newCachedThreadPool();
+    private final ExecutorService ex = Executors.newCachedThreadPool();
 
     @Override
     public ParseResult<ParseModel> parse(Row row) {
         Future<ParseResult<Ship>> futureShip;
-        Future<ParseResult<List<Engine>>> futureEngines = null;
-        Future<ParseResult<ShipCapacity>> futureCapacity = null;
-        Future<ParseResult<ShipDimensions>> futureDimensions = null;
-        Future<ParseResult<List<OwnOperator>>> futureOwnOperators = null;
+        Future<ParseResult<List<Engine>>> futureEngines;
+        Future<ParseResult<ShipCapacity>> futureCapacity;
+        Future<ParseResult<ShipDimensions>> futureDimensions;
+        Future<ParseResult<List<OwnOperator>>> futureOwnOperators;
         try {
             StringBuilder err = new StringBuilder();
 
@@ -98,6 +93,25 @@ public class ExcelParser implements ParserBase<ParseModel> {
 
     @Override
     public void parseToExcel(ParseModel parseModel, Row row) {
+        Ship ship = parseModel.getShip();
+        ShipCapacity capacity = ship.getShipCapacity();
+        ShipDimensions dimensions = ship.getShipDimensions();
+        ShipEngine shipEngine = ship.getShipEngine();
 
+        List<Engine> engines = new ArrayList<>();
+        engines.add(shipEngine.getEngine1());
+        engines.add(shipEngine.getEngine2());
+        engines.add(shipEngine.getEngine3());
+
+        List<OwnOperator> ownOperators = new ArrayList<>();
+        ownOperators.add(ship.getOwn());
+        ownOperators.add(ship.getOperator());
+
+
+        shipParser.parseToExcel(ship, row);
+        capacityParser.parseToExcel(capacity, row);
+        dimensionsParser.parseToExcel(dimensions, row);
+        enginesParser.parseToExcel(engines, row);
+        ownOperatorParser.parseToExcel(ownOperators, row);
     }
 }

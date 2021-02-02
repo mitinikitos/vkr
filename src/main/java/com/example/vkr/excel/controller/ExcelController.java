@@ -1,6 +1,7 @@
 package com.example.vkr.excel.controller;
 
 import com.example.vkr.excel.service.ExcelService;
+import com.example.vkr.ship.model.Ship;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.time.LocalTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/excel")
@@ -21,8 +23,13 @@ public class ExcelController {
     @Autowired
     ExcelService excelService;
 
+    /**
+     * Parse given {@link File} to db
+     * @param file must not be {@literal null}. {@link MediaType#MULTIPART_FORM_DATA}
+     * @return if parsed success: {@link String} errors during parser
+     * Else: {@link String server error}
+     */
     @RequestMapping(value = "/save", method = RequestMethod.POST)
-//    @PostMapping("/save")
     public ResponseEntity<?> parseExcel(@RequestParam("file") MultipartFile file) {
         if (!file.isEmpty()) {
             try {
@@ -51,25 +58,27 @@ public class ExcelController {
             return ResponseEntity.badRequest().body("");
     }
 
-//    @GetMapping("/download")
-//    public ResponseEntity<ByteArrayResource> downloadExcel() {
-//        try {
-//            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//            Workbook workbook = excelService.downloadExcel();
-//
-//            HttpHeaders header = new HttpHeaders();
-//            header.setContentType(new MediaType("application", "force-download"));
-//            header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ProductTemplate.xlsx");
-//
-////            response.setContentType("application/force-download");
-////            response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=simple.xlsx");
-//            workbook.write(byteArrayOutputStream);
-//            workbook.close();
-//            return new ResponseEntity<>(new ByteArrayResource(byteArrayOutputStream.toByteArray()),
-//                    header, HttpStatus.CREATED);
-////            response.flushBuffer();
-//        } catch (Exception e) {
-//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
+    /**
+     * Download {@link Workbook} for the given {@link List} {@link Ship} id
+     * @param idsShip must not be {@literal null}. List Ship id
+     * @return {@link ByteArrayResource}
+     */
+    @GetMapping("/download")
+    public ResponseEntity<ByteArrayResource> downloadExcel(@RequestBody List<Integer> idsShip) {
+        try {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            Workbook workbook = excelService.downloadExcel(idsShip);
+
+            HttpHeaders header = new HttpHeaders();
+            header.setContentType(new MediaType("application", "force-download"));
+            header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ProductTemplate.xlsx");
+
+            workbook.write(byteArrayOutputStream);
+            workbook.close();
+            return new ResponseEntity<>(new ByteArrayResource(byteArrayOutputStream.toByteArray()),
+                    header, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
