@@ -23,7 +23,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<User> findAll() {
-        return (List<User>) authRepository.findAll();
+        return authRepository.findAll();
     }
 
     @Override
@@ -47,7 +47,7 @@ public class AdminServiceImpl implements AdminService {
             return user;
         } else {
             user.addRole(role);
-            return authRepository.saveAndFlush(user).get();
+            return authRepository.save(user);
         }
     }
 }

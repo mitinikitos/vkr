@@ -7,8 +7,6 @@ import com.example.vkr.auth.service.RoleService;
 import com.example.vkr.config.TokenProvider;
 import com.example.vkr.exception.UnprocessableEntityException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -47,12 +45,6 @@ public class AuthServiceImpl implements UserDetailsService, AuthService {
 
     @Override
     public AuthToken generateToken(Authentication authentication) {
-//        final Authentication authentication = authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(
-//                        loginUser.getUserName(),
-//                        loginUser.getPassword()
-//                )
-//        );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         final String token = jwtTokenUtil.generateToken(authentication);
         return new AuthToken(token);
@@ -95,7 +87,7 @@ public class AuthServiceImpl implements UserDetailsService, AuthService {
 
     @Override
     public List<User> findAll() {
-        return (List<User>) authRepository.findAll();
+        return authRepository.findAll();
     }
 
     @Override

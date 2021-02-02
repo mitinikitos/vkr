@@ -63,8 +63,6 @@ public class AuthController {
         );
         final AuthToken authToken = authService.generateToken(authentication);
 
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-//        final String token = jwtTokenUtil.generateToken(authentication);
         return ResponseEntity.ok(authToken);
     }
 
