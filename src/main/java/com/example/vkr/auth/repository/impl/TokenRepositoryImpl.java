@@ -21,10 +21,12 @@ public class TokenRepositoryImpl implements TokenRepository {
         redisTemplate.opsForValue().set(token.getToken(), token, token.getExpiration(), TimeUnit.MILLISECONDS);
     }
 
+    @Override
     public LockedToken get(String key) {
         return redisTemplate.opsForValue().get(key);
     }
 
+    @Override
     public boolean isBlockedList(String token) {
         LockedToken lockedToken = redisTemplate.opsForValue().get(token);
         return lockedToken == null;

@@ -29,7 +29,6 @@ import javax.sql.DataSource;
         "com.example.vkr.ship.model",
         "com.example.vkr.auth.model"
 })
-//@ComponentScan("com.example.vkr")
 public class VkrJPAConfig {
 
     @Bean
