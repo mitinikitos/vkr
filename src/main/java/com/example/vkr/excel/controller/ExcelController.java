@@ -61,17 +61,22 @@ public class ExcelController {
     /**
      * Download {@link Workbook} for the given {@link List} {@link Ship} id
      * @param idsShip must not be {@literal null}. List Ship id
+     * @param type can be {@literal null}. Format saved file, {@link String xslx, xslx}.
+     * DefaultValue {@link String xslx}.
      * @return {@link ByteArrayResource}
      */
     @GetMapping("/download")
-    public ResponseEntity<ByteArrayResource> downloadExcel(@RequestBody List<Integer> idsShip) {
+    public ResponseEntity<ByteArrayResource> downloadExcel(
+            @RequestBody List<Integer> idsShip,
+            @RequestParam(value = "type", required = false, defaultValue = "xslx") String type) {
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             Workbook workbook = excelService.downloadExcel(idsShip);
 
             HttpHeaders header = new HttpHeaders();
+            String fileName = "SaveFile." + type;
             header.setContentType(new MediaType("application", "force-download"));
-            header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ProductTemplate.xlsx");
+            header.set(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", fileName));
 
             workbook.write(byteArrayOutputStream);
             workbook.close();

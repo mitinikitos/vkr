@@ -87,15 +87,18 @@ public class ExcelServiceImpl implements ExcelService {
 
         XSSFSheet sheet = workbook.createSheet("Ships");
 
-        for (int i = 0; i < idsShip.size(); i++) {
-            Row row = sheet.createRow(i);
+        int rowNum = 0;
+
+        for (Integer id : idsShip) {
             ParseModel parseModel = new ParseModel();
             try {
-                Ship ship = shipService.findById(idsShip.get(i));
+                Ship ship = shipService.findById(id);
                 parseModel.setShip(ship);
-            } catch (EntityNotFoundException e){
+            } catch (Exception e) {
                 continue;
             }
+
+            Row row = sheet.createRow(rowNum++);
             excelParser.parseToExcel(parseModel, row);
         }
         return workbook;

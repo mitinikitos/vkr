@@ -76,7 +76,6 @@ public class ExcelParser implements ParserBase<ParseModel> {
             dimensions.setShip(ship);
             dimensions.setRegNum(ship.getId());
 
-
             ship.setOwn(ownOperators.get(0));
             ship.setOperator(ownOperators.get(1));
             ship.setShipCapacity(capacity);
