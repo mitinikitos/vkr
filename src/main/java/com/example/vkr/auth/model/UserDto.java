@@ -1,6 +1,8 @@
 package com.example.vkr.auth.model;
 
 
+import com.example.vkr.util.View;
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonView(View.UI.class)
 public class UserDto {
     private String userName;
     private String password;

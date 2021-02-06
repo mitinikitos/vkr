@@ -1,14 +1,15 @@
 package com.example.vkr.base.service.impl;
 
 import com.example.vkr.base.service.BaseService;
+import com.example.vkr.exception.BindingException;
 import com.example.vkr.exception.EntityExistsException;
 import com.example.vkr.exception.EntityNotFoundException;
 import com.example.vkr.base.repository.BaseRepository;
+import io.jsonwebtoken.lang.Assert;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,11 +25,14 @@ public class BaseServiceImpl<T, ID> implements BaseService<T, ID> {
     }
 
     @Override
-    public <S extends T> S save(S entity) throws EntityExistsException {
+    public <S extends T> S save(S entity) throws EntityExistsException, BindingException {
         try {
+            Assert.notNull(entity, "The entity must not be null");
             return baseRepository.save(entity);
         } catch (DataIntegrityViolationException e) {
             throw new EntityExistsException(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new BindingException(e.getMessage());
         }
     }
 
@@ -46,15 +50,20 @@ public class BaseServiceImpl<T, ID> implements BaseService<T, ID> {
     }
 
     @Override
-    public T findById(ID id) throws EntityNotFoundException {
+    public T findById(ID id) throws EntityNotFoundException, BindingException {
+        try {
+            Assert.notNull(id, "Id must not be null");
 
-        Optional<T> optionalT = baseRepository.findById(id);
+            Optional<T> optionalT = baseRepository.findById(id);
 
-        if (optionalT.isEmpty()) {
-            throw new EntityNotFoundException("Entity not found");
+            if (optionalT.isEmpty()) {
+                throw new EntityNotFoundException("Entity not found");
+            }
+
+            return optionalT.get();
+        } catch (IllegalArgumentException e) {
+            throw new BindingException(e.getMessage());
         }
-
-        return optionalT.get();
     }
 
     @Override
@@ -68,12 +77,26 @@ public class BaseServiceImpl<T, ID> implements BaseService<T, ID> {
     }
 
     @Override
-    public void delete(T entity) throws EntityNotFoundException {
-        baseRepository.delete(entity);
+    public void delete(T entity) throws EntityNotFoundException, BindingException {
+        try {
+            Assert.notNull(entity, "Entity must not be null");
+
+            baseRepository.delete(entity);
+
+        } catch (IllegalArgumentException e) {
+            throw new BindingException(e.getMessage());
+        }
     }
 
     @Override
-    public void deleteById(ID id) throws EntityNotFoundException {
-        baseRepository.deleteById(id);
+    public void deleteById(ID id) throws EntityNotFoundException, BindingException {
+        try {
+            Assert.notNull(id, "Id must not be null");
+
+            baseRepository.deleteById(id);
+
+        } catch (IllegalArgumentException e) {
+            throw new BindingException(e.getMessage());
+        }
     }
 }

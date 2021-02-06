@@ -1,7 +1,5 @@
 package com.example.vkr.config;
 
-import com.example.vkr.auth.service.TokenService;
-import com.example.vkr.exception.BlackListTokenException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import org.springframework.beans.factory.annotation.Autowired;

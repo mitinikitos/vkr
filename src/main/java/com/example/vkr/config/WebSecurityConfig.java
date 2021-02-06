@@ -14,13 +14,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.OrRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -34,30 +29,27 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UnauthorizedEntryPoint unauthorizedEntryPoint;
 
+    @Autowired
+    private AuthProvider authProvider;
+
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(encoder());
+//        auth.userDetailsService(userDetailsService).passwordEncoder(encoder());
+        auth.authenticationProvider(authProvider);
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        List<RequestMatcher> requestMatchers = new ArrayList<RequestMatcher>();
-
-        requestMatchers.add(new AntPathRequestMatcher("/ship/**"));
-        requestMatchers.add(new AntPathRequestMatcher("/auth/**"));
-        requestMatchers.add(new AntPathRequestMatcher("/excel/**"));
 
         http.cors().and().csrf().disable()
-                .requestMatcher(new OrRequestMatcher(requestMatchers))
+//                .requestMatcher(new OrRequestMatcher(requestMatchers))
                 .authorizeRequests()
                     .antMatchers("/auth/**", "/ship/**", "/excel/**").permitAll()
-//                    .antMatchers("/auth/userpings").hasRole("USER")
-//                    .antMatchers("/auth/adminping").hasRole("ADMIN")
                     .anyRequest().authenticated()
                 .and()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint)
+                    .exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint)
                 .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(blackListFilterBean(), JwtAuthenticationFilter.class);
@@ -75,12 +67,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public JwtBlackListFilter blackListFilterBean() throws Exception {
+    public JwtBlackListFilter blackListFilterBean() {
         return new JwtBlackListFilter();
     }
 
     @Bean
-    public JwtAuthenticationFilter authenticationTokenFilterBean() throws Exception {
+    public JwtAuthenticationFilter authenticationTokenFilterBean() {
         return new JwtAuthenticationFilter();
     }
 }

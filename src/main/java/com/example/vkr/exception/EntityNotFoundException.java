@@ -2,11 +2,11 @@ package com.example.vkr.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.server.ResponseStatusException;
 
-@ResponseStatus(HttpStatus.NOT_FOUND)
-public class EntityNotFoundException extends Exception {
+public class EntityNotFoundException extends ResponseStatusException {
 
     public EntityNotFoundException(String id) {
-        super("entity not found: " + id);
+        super(HttpStatus.NOT_FOUND ,"entity not found: " + id);
     }
 }

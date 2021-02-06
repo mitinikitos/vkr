@@ -179,7 +179,8 @@ public class BaseRepositoryImpl<T, ID> implements BaseRepository<T, ID> {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW,
-            rollbackFor = { DataIntegrityViolationException.class, ConstraintViolationException.class })
+            rollbackFor = { DataIntegrityViolationException.class, ConstraintViolationException.class },
+            timeout = 10)
     public <S extends T> S save(S entity) {
 
         Assert.notNull(entity, "Entity must not be null.");
@@ -207,22 +208,18 @@ public class BaseRepositoryImpl<T, ID> implements BaseRepository<T, ID> {
     @Override
     public Optional<T> findById(ID id) {
 
+        Assert.notNull(id, "Id must not be null");
+
         Class<T> domain = getDomainClass();
 
-        return Optional.ofNullable(em.getReference(domain, id));
+        return Optional.ofNullable(em.find(domain, id));
     }
 
-
-    /**
-     * Delete entity
-     * @param entity must not be {@literal null}.
-     * @exception EntityNotFoundException if entity not exists
-     */
     @Override
     @Transactional
     public void delete(T entity) throws EntityNotFoundException {
 
-        Assert.notNull(entity, "Entity must not be null!");
+//        Assert.notNull(entity, "Entity must not be null!");
 
         Class<?> type = ProxyUtils.getUserClass(entity);
 
@@ -235,16 +232,11 @@ public class BaseRepositoryImpl<T, ID> implements BaseRepository<T, ID> {
         em.remove(em.contains(entity) ? entity : em.merge(entity));
     }
 
-    /**
-     * Delete entity for the given {@link ID}
-     * @param id must not be {@literal null}.
-     * @exception EntityNotFoundException if entity for the given {@link ID} not exists.
-     */
     @Override
     @Transactional
     public void deleteById(ID id) throws EntityNotFoundException {
 
-        Assert.notNull(id, "Id must not be null");
+//        Assert.notNull(id, "Id must not be null");
 
         delete(findById(id).orElseThrow(() -> new EntityNotFoundException(
                 String.format("No %s entity with id %s!", getDomainClass(), id))));

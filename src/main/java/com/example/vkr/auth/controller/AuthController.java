@@ -8,7 +8,7 @@ import com.example.vkr.auth.model.UserDto;
 import com.example.vkr.auth.service.AuthService;
 import com.example.vkr.auth.service.TokenService;
 import com.example.vkr.exception.BindingException;
-import com.example.vkr.exception.UnprocessableEntityException;
+import com.example.vkr.exception.EntityExistsException;
 import com.example.vkr.util.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +19,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,10 +48,12 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    @RequestMapping(value = "/signUp", method = RequestMethod.POST)
+    /**
+     *
+     */
+    @RequestMapping(value = "/signIn", method = RequestMethod.POST)
     public ResponseEntity<?> generateToken(@RequestBody @Valid LoginUser loginUser, BindingResult bindingResult)
-            throws AuthenticationException, BindingException {
-
+            throws BindingException, AuthenticationException {
         if (bindingResult.hasErrors()) {
             throw new BindingException("Error json");
         }
@@ -75,8 +78,9 @@ public class AuthController {
         return ResponseEntity.ok().body("by");
     }
 
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ResponseEntity<?> saveUser(@RequestBody UserDto userDto) throws UnprocessableEntityException {
+    @RequestMapping(value = "/signUp", method = RequestMethod.POST)
+    public ResponseEntity<?> saveUser(@RequestBody UserDto userDto)
+            throws EntityExistsException, BindingException {
         User user = authService.save(userDto);
         return ResponseEntity.status(201).body(user);
     }
@@ -95,13 +99,13 @@ public class AuthController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value = "/adminping", method = RequestMethod.GET)
+    @RequestMapping(value = "/adminPing", method = RequestMethod.GET)
     public String adminPing() {
         return "Only Admins Can Read This";
     }
 
     @PreAuthorize("hasRole('USER')")
-    @RequestMapping(value = "/userping", method = RequestMethod.GET)
+    @RequestMapping(value = "/userPing", method = RequestMethod.GET)
     public String userPing() {
         return "Any User Can Read This";
     }
