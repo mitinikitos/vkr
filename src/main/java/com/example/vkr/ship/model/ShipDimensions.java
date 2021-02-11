@@ -21,38 +21,29 @@ public class ShipDimensions {
     @Column(name = "reg_num")
     private int regNum;
     @JsonView(View.REST.class)
-    @OneToOne(targetEntity = Ship.class, fetch = FetchType.LAZY)
-    @PrimaryKeyJoinColumn(name = "reg_num", referencedColumnName = "reg_num")
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "reg_num", referencedColumnName = "reg_num")
     private Ship ship;
 
     @Nullable
     @Column(name = "disp")
     private int disp;
     @Nullable
-    @Column(name = "length")
+    @Column(name = "length", columnDefinition = "double precision")
     private double length;
     @Nullable
-    @Column(name = "breadth")
+    @Column(name = "breadth", columnDefinition = "double precision")
     private double breadth;
     @Nullable
-    @Column(name = "draught")
+    @Column(name = "draught", columnDefinition = "double precision")
     private double draught;
     @Nullable
-    @Column(name = "depth")
+    @Column(name = "depth", columnDefinition = "double precision")
     private double depth;
     @Nullable
-    @Column(name = "class")
+    @Column(name = "class", columnDefinition = "text")
     private String shipClass;
 
-    /**
-     * Creates {@link ShipDimensions}.
-     * @param disp can be {@literal null}.
-     * @param length can be {@literal null}.
-     * @param breadth can be {@literal null}.
-     * @param depth can be {@literal null}.
-     * @param draught can be {@literal null}.
-     * @param shipClass can be {@literal null}.
-     */
     public ShipDimensions(@Nullable int disp, @Nullable double length, @Nullable double breadth,
                           @Nullable double depth, @Nullable double draught, @Nullable String shipClass) {
         this.disp = disp;
@@ -63,10 +54,6 @@ public class ShipDimensions {
         this.shipClass = shipClass;
     }
 
-    /**
-     * Creates default {@link ShipDimensions} for the given {@link Ship}
-     * @param ship must not be {@literal null}
-     */
     public ShipDimensions(Ship ship) {
         this.regNum = ship.getId();
         this.ship = ship;

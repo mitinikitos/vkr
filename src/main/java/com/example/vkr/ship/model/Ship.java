@@ -4,8 +4,7 @@ import com.example.vkr.util.View;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.sun.istack.Nullable;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.engine.spi.PersistentAttributeInterceptor;
 
 import javax.persistence.*;
@@ -15,8 +14,10 @@ import javax.persistence.*;
 @Table(name = "ship")
 @JsonView(View.UI.class)
 @JsonIgnoreProperties({"hibernateLazyInitializer"})
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Ship {
 
     @Transient
@@ -24,26 +25,26 @@ public class Ship {
 
     @Id
     @Column(name = "reg_num")
-    private int id;
-    @Column(name = "name")
+    private Integer id;
+    @Column(name = "name", columnDefinition = "text")
     private String name;
     @Nullable
-    @Column(name = "type")
+    @Column(name = "type", columnDefinition = "text")
     private String type;
     @Nullable
-    @Column(name = "sub_type")
+    @Column(name = "sub_type", columnDefinition = "text")
     private String subType;
     @Nullable
     @Column(name = "imo")
     private Integer imo;
     @Nullable
-    @Column(name = "call_sign")
+    @Column(name = "call_sign", columnDefinition = "text")
     private String callSign;
     @Nullable
-    @Column(name = "project")
+    @Column(name = "project", columnDefinition = "text")
     private String project;
     @Nullable
-    @Column(name = "port")
+    @Column(name = "port", columnDefinition = "text")
     private String port;
     @Nullable
     @Column(name = "speed")
@@ -53,7 +54,7 @@ public class Ship {
     private Integer godP;
 
     @Nullable
-    @Column(name = "own_name")
+    @Column(name = "own_name", columnDefinition = "text")
     private String ownName;
     @Nullable
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -62,7 +63,7 @@ public class Ship {
     private OwnOperator own;
 
     @Nullable
-    @Column(name = "operator_name")
+    @Column(name = "operator_name", columnDefinition = "text")
     private String operatorName;
     @Nullable
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -85,19 +86,6 @@ public class Ship {
     @JsonView(View.REST.class)
     private ShipDimensions shipDimensions;
 
-    /**
-     * Creates {@link Ship}
-     * @param id must not de {@literal null}
-     * @param name must not be {@literal null}
-     * @param type can be {@literal null}
-     * @param subType can be {@literal null}
-     * @param imo can be {@literal null}
-     * @param callSign can be {@literal null}
-     * @param project can be {@literal null}
-     * @param port can be {@literal null}
-     * @param godP can be {@literal null}
-     * @param speed can be {@literal null}
-     */
     public Ship(int id, String name, @Nullable String type,
                 @Nullable String subType, @Nullable Integer imo, @Nullable String callSign,
                 @Nullable String project, @Nullable String port, @Nullable Integer godP,
@@ -112,33 +100,21 @@ public class Ship {
         this.port = port;
         this.godP = godP;
         this.speed = speed;
+        this.shipCapacity = new ShipCapacity(this);
+        this.shipEngine = new ShipEngine(this);
+        this.shipDimensions = new ShipDimensions(this);
     }
 
-    /**
-     * Set {@link Ship#own} and {@link Ship#ownName} for the given {@link OwnOperator}.
-     * @param own can be {@literal null}
-     */
     public void setOwn(@Nullable OwnOperator own) {
         this.own = own;
         this.ownName = own == null ? null : own.getName();
     }
 
-    /**
-     * Set {@link Ship#operator} and {@link Ship#operatorName} for the given {@link OwnOperator}.
-     * @param operator can be {@literal null}
-     */
     public void setOperator(@Nullable OwnOperator operator) {
         this.operator = operator;
         this.operatorName = operator == null ? null : operator.getName();
     }
 
-    /**
-     * Creates {@link Ship} for test
-     * @param id must not be {@literal null}
-     * @param name must not be {@literal null}
-     * @param imo can be {@literal null}
-     * @param godP can be {@literal null}
-     */
     public Ship(int id, String name,
                 @Nullable int imo, @Nullable int godP) {
         this(id, name, null, null, imo, null, null, null, godP, null);

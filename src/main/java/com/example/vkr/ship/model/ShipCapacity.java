@@ -27,7 +27,7 @@ public class ShipCapacity {
 
     @Id
     @Column(name = "reg_num")
-    private int regNum;
+    private Integer regNum;
 
     @JsonView(View.REST.class)
     @OneToOne(fetch = FetchType.LAZY, optional = false)
@@ -50,9 +50,6 @@ public class ShipCapacity {
     @Column(name = "nt")
     private int nt;
 
-    /**
-     *
-     */
     public ShipCapacity(@Nullable int dedv, @Nullable int passK, @Nullable int passP,
                         @Nullable int gt, @Nullable int nt) {
         this.dedv = dedv;
@@ -62,10 +59,6 @@ public class ShipCapacity {
         this.nt = nt;
     }
 
-    /**
-     * Creates default {@link ShipCapacity} for the given {@link Ship}
-     * @param ship must not be {@literal null}
-     */
     public ShipCapacity(Ship ship) {
         this.regNum = ship.getId();
         this.ship = ship;
@@ -77,7 +70,6 @@ public class ShipCapacity {
         }
         return this.ship;
     }
-
     public void setShip(Ship ship) {
         if ($$_hibernate_attributeInterceptor != null) {
             this.ship = (Ship) $$_hibernate_attributeInterceptor.writeObject(this, "ship", this.ship, ship);

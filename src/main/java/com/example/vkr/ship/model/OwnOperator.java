@@ -11,7 +11,7 @@ import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "own_operator")
@@ -27,30 +27,30 @@ import java.util.Set;
 public class OwnOperator {
 
     @Id
-    @Column(name = "name")
+    @Column(name = "name", columnDefinition="text")
     private String name;
 
     @Nullable
-    @Column(name = "address")
+    @Column(name = "address", columnDefinition = "text")
     private String address;
     @Nullable
     @Column(name = "phones", columnDefinition = "text[]")
     @Type(type = "string-array")
     private String[] phones;
     @Nullable
-    @Column(name = "email")
+    @Column(name = "email", columnDefinition = "text")
     private String email;
     @Nullable
-    @Column(name = "fax", nullable = true, columnDefinition = "text[]")
+    @Column(name = "fax", columnDefinition = "text[]")
     @Type(type = "string-array")
     private String[] fax;
 
     @JsonView(View.REST.class)
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "own")
-    private Set<Ship> shipsOwn;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "own", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Ship> shipsOwn;
     @JsonView(View.REST.class)
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "operator")
-    private Set<Ship> shipsOperator;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "operator", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Ship> shipsOperator;
 
     public OwnOperator(String name, @Nullable String address, @Nullable String[] phones,
                        @Nullable String email, @Nullable String[] fax) {
@@ -84,7 +84,7 @@ public class OwnOperator {
 
     @Override
     public String toString() {
-        return "OwnOperator [ " + name + ", " + address + ", " + phones.toString() + ", " +
-                email + ", " + fax.toString() + " ]";
+        return "OwnOperator [ " + name + ", " + address + ", " + getPhones() + ", " +
+                email + ", " + getFax() + " ]";
     }
 }

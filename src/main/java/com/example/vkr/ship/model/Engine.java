@@ -25,13 +25,13 @@ public class Engine {
             strategy = "org.hibernate.id.UUIDGenerator"
     )
     @JsonView(View.REST.class)
-    @Column(name = "id")
+    @Column(name = "id", columnDefinition = "uuid")
     private UUID id;
     @Column(name = "eng_count")
     private int count;
     @Column(name = "eng_pwr")
     private int pwr;
-    @Column(name = "dvig")
+    @Column(name = "dvig", columnDefinition = "text")
     private String dvig;
 
     /**
