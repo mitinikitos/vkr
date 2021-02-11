@@ -23,9 +23,6 @@ import javax.annotation.Resource;
 @Order(1)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Resource(name = "authService")
-    private UserDetailsService userDetailsService;
-
     @Autowired
     private UnauthorizedEntryPoint unauthorizedEntryPoint;
 
@@ -34,7 +31,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.userDetailsService(userDetailsService).passwordEncoder(encoder());
         auth.authenticationProvider(authProvider);
     }
 

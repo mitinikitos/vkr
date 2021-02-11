@@ -38,8 +38,9 @@ public interface AuthService {
     /**
      * Delete {@link User} for given userName
      * @throws EntityNotFoundException if {@link User} with given {@literal userName} not exists
+     * @throws BindingException if {@code id} is {@literal null}
      */
-    void deleteByName(String userName) throws EntityNotFoundException;
+    void deleteByName(String userName);
     /**
      * Generate AccessToken for given {@link Authentication}
      * @return {@link AuthToken}

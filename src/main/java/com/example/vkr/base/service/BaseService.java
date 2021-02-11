@@ -15,7 +15,7 @@ public interface BaseService<T, ID> {
      * @exception BindingException if {@literal entity} or entity id is {@literal null}
      * @return saved entity
      */
-    <S extends T> S save(S entity) throws EntityExistsException, BindingException;
+    <S extends T> S save(S entity);
     /**
      *
      */

@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.Optional;
 import java.util.UUID;
@@ -56,8 +57,12 @@ public class AuthRepositoryImpl extends BaseRepositoryImpl<User, UUID> implement
     @Override
     @Transactional
     public void delete(User user) throws EntityNotFoundException {
-        em.createNativeQuery(DELETE_USER_ROLE).setParameter("userId", user.getId()).executeUpdate();
-        em.createNativeQuery(DELETE_USER).setParameter("userId", user.getId()).executeUpdate();
+        Query deleteUserRoleQuery = getNativeQuery(DELETE_USER_ROLE);
+        Query deleteUserQuery = getNativeQuery(DELETE_USER);
+        deleteUserRoleQuery.setParameter("userId", user.getId());
+        deleteUserQuery.setParameter("userId", user.getId());
+        deleteUserRoleQuery.executeUpdate();
+        deleteUserQuery.executeUpdate();
     }
 
     @Override
@@ -69,6 +74,4 @@ public class AuthRepositoryImpl extends BaseRepositoryImpl<User, UUID> implement
         )));
 
     }
-
-
 }

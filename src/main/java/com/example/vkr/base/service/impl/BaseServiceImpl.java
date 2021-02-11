@@ -25,7 +25,7 @@ public class BaseServiceImpl<T, ID> implements BaseService<T, ID> {
     }
 
     @Override
-    public <S extends T> S save(S entity) throws EntityExistsException, BindingException {
+    public <S extends T> S save(S entity) {
         try {
             Assert.notNull(entity, "The entity must not be null");
             return baseRepository.save(entity);

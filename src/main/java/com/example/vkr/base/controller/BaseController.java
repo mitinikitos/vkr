@@ -8,7 +8,6 @@ import com.example.vkr.util.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -23,10 +22,6 @@ public abstract class BaseController<T, ID> {
 
     protected final BaseService<T, ID> service;
 
-    /**
-     * Creates {@link BaseController} for the given {@link BaseService}
-     * @param service must not be {@literal null}
-     */
     public BaseController(BaseService<T, ID> service) {
         this.service = service;
     }
@@ -48,11 +43,12 @@ public abstract class BaseController<T, ID> {
      * Return {@link T} by {@link ID}
      * @param id must not be {@literal null}.
      * @exception EntityNotFoundException if entity not exists
+     * @exception BindingException if given id is {@literal null}
      * @return {@link T} if exists
      */
     @JsonView(View.UI.class)
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable("id") ID id) throws EntityNotFoundException {
+    public ResponseEntity<?> getById(@PathVariable("id") ID id) throws EntityNotFoundException, BindingException {
         T res = service.findById(id);
         return ResponseEntity.ok().body(res);
     }
@@ -61,11 +57,12 @@ public abstract class BaseController<T, ID> {
      * Delete entity for the given {@link ID}. Access only to registered users
      * @param id must not be {@literal null}.
      * @exception EntityNotFoundException if entity not exists
+     * @exception BindingException if given id is {@literal null}
      * @return {@link ResponseEntity#ok()}
      */
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteById(@PathVariable("id") ID id) throws EntityNotFoundException {
+    public ResponseEntity<?> deleteById(@PathVariable("id") ID id) throws EntityNotFoundException, BindingException {
         service.deleteById(id);
         return ResponseEntity.ok().body(String.format("Delete entity with id %s success", id));
     }
@@ -73,7 +70,6 @@ public abstract class BaseController<T, ID> {
     /**
      * Create entity.
      * @param entity must not be {@literal null}.
-     * @param bindingResult result bilding entity.
      * @method POST
      * @exception BindingException if binding entity has error.
      * @exception EntityExistsException if entity already exists.
@@ -84,12 +80,8 @@ public abstract class BaseController<T, ID> {
     @RequestMapping(value = "/add",
             method = RequestMethod.POST,
             headers = { "Content-type=application/json" })
-    public ResponseEntity<?> addEntity(@RequestBody @Valid T entity, BindingResult bindingResult)
+    public ResponseEntity<?> addEntity(@RequestBody @Valid T entity)
             throws BindingException, EntityExistsException {
-
-        if (bindingResult.hasErrors()) {
-            throw new BindingException("Error in Json");
-        }
 
         T saveEntity = service.save(entity);
 

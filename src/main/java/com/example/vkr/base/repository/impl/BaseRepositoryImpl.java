@@ -18,6 +18,7 @@ import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -240,5 +241,15 @@ public class BaseRepositoryImpl<T, ID> implements BaseRepository<T, ID> {
 
         delete(findById(id).orElseThrow(() -> new EntityNotFoundException(
                 String.format("No %s entity with id %s!", getDomainClass(), id))));
+    }
+
+    /**
+     * Create {@link Query}.
+     * @param query must not be {@literal null}.
+     * @throws IllegalArgumentException if given {@code query} is {@literal null}.
+     */
+    protected Query getNativeQuery(String query) {
+        Assert.notNull(query, "Query must not be null");
+        return em.createNativeQuery(query);
     }
 }

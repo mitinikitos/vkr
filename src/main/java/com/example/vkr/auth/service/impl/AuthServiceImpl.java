@@ -10,16 +10,11 @@ import com.example.vkr.auth.service.RoleService;
 import com.example.vkr.config.TokenProvider;
 import com.example.vkr.exception.BindingException;
 import com.example.vkr.exception.EntityExistsException;
-import com.example.vkr.exception.EntityNotFoundException;
 import io.jsonwebtoken.lang.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,11 +22,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service(value = "authService")
-public class AuthServiceImpl implements UserDetailsService, AuthService {
+public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private RoleService roleService;
@@ -41,10 +34,6 @@ public class AuthServiceImpl implements UserDetailsService, AuthService {
     private BCryptPasswordEncoder bcryptEncoder;
     @Autowired
     private TokenProvider jwtTokenUtil;
-
-    private static final String EMAIL_PATTERN =
-            "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@" +
-                    "[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
     @Override
     public AuthToken refresh() {
@@ -60,33 +49,6 @@ public class AuthServiceImpl implements UserDetailsService, AuthService {
         return new AuthToken(token);
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> optionalUser;
-        String userName;
-        User user;
-        if (isEmail(username)) {
-            optionalUser = authRepository.findByEmail(username);
-            if (optionalUser.isEmpty())
-                throw new UsernameNotFoundException("Invalid email");
-            user = optionalUser.get();
-            userName = user.getEmail();
-        } else {
-            optionalUser = authRepository.findByUserName(username);
-            if (optionalUser.isEmpty()){
-                throw new UsernameNotFoundException("Invalid username");
-            }
-            user = optionalUser.get();
-            userName = user.getUserName();
-        }
-        return new org.springframework.security.core.userdetails.User(userName, user.getPassword(), getAuthority(user));
-    }
-
-    private Set<SimpleGrantedAuthority> getAuthority(User user) {
-        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
-        user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName())));
-        return authorities;
-    }
 
     @Override
     public User save(UserDto user) throws EntityExistsException, BindingException {
@@ -143,17 +105,12 @@ public class AuthServiceImpl implements UserDetailsService, AuthService {
     }
 
     @Override
-    public void deleteByName(String userName) throws EntityNotFoundException {
-        authRepository.deleteByUserName(userName);
-    }
-
-    private boolean isEmail(String input) {
-        if (input != null)
-        {
-            Pattern p = Pattern.compile(EMAIL_PATTERN);
-            Matcher m = p.matcher(input);
-            return m.find();
+    public void deleteByName(String userName) {
+        try {
+            Assert.notNull(userName, "Username must not be null");
+            authRepository.deleteByUserName(userName);
+        } catch (IllegalArgumentException e) {
+            throw new BindingException(e.getMessage());
         }
-        return false;
     }
 }
