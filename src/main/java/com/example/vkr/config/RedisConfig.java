@@ -1,6 +1,6 @@
 package com.example.vkr.config;
 
-import com.example.vkr.auth.model.LockedToken;
+import com.example.vkr.auth.model.AuthToken;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -9,14 +9,9 @@ import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
-
-import java.util.UUID;
-import java.util.concurrent.locks.Lock;
 
 @Configuration
 @Log4j2
-@EnableRedisRepositories(basePackageClasses = LockedToken.class)
 public class RedisConfig {
 
     @Value("${spring.redis.host}")
@@ -40,8 +35,8 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, LockedToken> redisTemplate() {
-        RedisTemplate<String, LockedToken> template = new RedisTemplate<>();
+    public RedisTemplate<String, AuthToken> redisTokenTemplate() {
+        RedisTemplate<String, AuthToken> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactory());
         return template;
     }

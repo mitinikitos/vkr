@@ -7,9 +7,11 @@ import com.example.vkr.auth.model.UserDto;
 import com.example.vkr.auth.repository.AuthRepository;
 import com.example.vkr.auth.service.AuthService;
 import com.example.vkr.auth.service.RoleService;
+import com.example.vkr.auth.service.TokenService;
 import com.example.vkr.config.TokenProvider;
 import com.example.vkr.exception.BindingException;
 import com.example.vkr.exception.EntityExistsException;
+import com.example.vkr.exception.EntityNotFoundException;
 import io.jsonwebtoken.lang.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -27,6 +29,8 @@ import java.util.Set;
 public class AuthServiceImpl implements AuthService {
 
     @Autowired
+    private TokenService tokenService;
+    @Autowired
     private RoleService roleService;
     @Autowired
     private AuthRepository authRepository;
@@ -36,19 +40,17 @@ public class AuthServiceImpl implements AuthService {
     private TokenProvider jwtTokenUtil;
 
     @Override
-    public AuthToken refresh() {
+    public AuthToken generateToken() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         final String token = jwtTokenUtil.generateToken(authentication);
+        tokenService.saveToken(token);
         return new AuthToken(token);
     }
 
-    @Override
-    public AuthToken generateToken(Authentication authentication) {
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        final String token = jwtTokenUtil.generateToken(authentication);
-        return new AuthToken(token);
-    }
+    public AuthToken refresh() {
 
+        return null;
+    }
 
     @Override
     public User save(UserDto user) throws EntityExistsException, BindingException {
@@ -102,6 +104,17 @@ public class AuthServiceImpl implements AuthService {
         } catch (IllegalArgumentException e) {
             throw new BindingException(e.getMessage());
         }
+    }
+
+    @Override
+    public User getProfile() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = (String) authentication.getPrincipal();
+        Optional<User> optionalUser = authRepository.findByUserName(userName);
+        if (optionalUser.isEmpty()) {
+            throw new EntityNotFoundException("");
+        }
+        return optionalUser.get();
     }
 
     @Override

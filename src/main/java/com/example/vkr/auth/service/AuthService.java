@@ -45,10 +45,7 @@ public interface AuthService {
      * Generate AccessToken for given {@link Authentication}
      * @return {@link AuthToken}
      */
-    AuthToken generateToken(Authentication authentication);
+    AuthToken generateToken();
 
-    /**
-     *
-     */
-    AuthToken refresh();
+    User getProfile();
 }

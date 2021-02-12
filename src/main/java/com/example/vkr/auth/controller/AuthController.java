@@ -12,32 +12,24 @@ import com.example.vkr.exception.EntityExistsException;
 import com.example.vkr.util.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/auth")
 @JsonView(View.UI.class)
 public class AuthController {
-
-    @Value("${jwt.header.string}")
-    private String HEADER_STRING;
-
-    @Value("${jwt.token.prefix}")
-    private String TOKEN_PREFIX;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -52,7 +44,7 @@ public class AuthController {
      *
      */
     @RequestMapping(value = "/signIn", method = RequestMethod.POST)
-    public ResponseEntity<?> generateToken(@RequestBody @Valid LoginUser loginUser, BindingResult bindingResult)
+    public ResponseEntity<?> generateToken(@RequestBody @Validated(LoginUser.class) final LoginUser loginUser, BindingResult bindingResult)
             throws BindingException, AuthenticationException {
         if (bindingResult.hasErrors()) {
             throw new BindingException("Error json");
@@ -64,18 +56,15 @@ public class AuthController {
                         loginUser.getPassword()
                 )
         );
-        final AuthToken authToken = authService.generateToken(authentication);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        final AuthToken authToken = authService.generateToken();
 
         return ResponseEntity.ok(authToken);
     }
 
     @GetMapping("/logout")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> logout(HttpServletRequest req, HttpServletResponse res) {
-        String authToken = getTokenFromHeader(req);
-
-        tokenService.saveLockedToken(authToken);
-        return ResponseEntity.ok().body("by");
+    public void logout() {
     }
 
     @RequestMapping(value = "/signUp", method = RequestMethod.POST)
@@ -87,15 +76,17 @@ public class AuthController {
 
     @GetMapping("/refresh")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> refresh() {
-        final AuthToken authToken = authService.refresh();
+    public ResponseEntity<?> refresh(HttpServletRequest req) {
+//        final AuthToken authToken = authService.generateToken();
+        final AuthToken authToken = (AuthToken) req.getAttribute("token");
         return ResponseEntity.ok().body(authToken);
     }
 
-    private String getTokenFromHeader(HttpServletRequest req) {
-        String header = req.getHeader(HEADER_STRING);
+    @GetMapping("/profile")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> getProfile() {
 
-        return header.replace(TOKEN_PREFIX, "").trim();
+        return null;
     }
 
     @PreAuthorize("hasRole('ADMIN')")

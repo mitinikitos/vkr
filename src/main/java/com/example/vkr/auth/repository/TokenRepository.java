@@ -1,21 +1,21 @@
 package com.example.vkr.auth.repository;
 
-import com.example.vkr.auth.model.LockedToken;
+import com.example.vkr.auth.model.AuthToken;
 
 public interface TokenRepository {
     /**
-     * Save {@link LockedToken} in black list
-     * @param token must not be {@literal null}.
+     * Save {@link AuthToken}
+     * @param authToken must not be {@literal null}.
      */
-    void saveLockedToken(final LockedToken token);
-    /**
-     * Returns {@link LockedToken} for the given key.
-     * @param key is the key to the value.
-     * @return {@link LockedToken}
-     */
-    LockedToken get(String key);
+    void saveToken(final AuthToken authToken);
     /**
      *
      */
-    boolean isBlockedList(String token);
+    AuthToken getAuthToken(String key);
+    /**
+     * Delete {@link AuthToken} for given {@code key}
+     * @param key must not be {@literal null}
+     *
+     */
+    Boolean deleteByKey(String key);
 }

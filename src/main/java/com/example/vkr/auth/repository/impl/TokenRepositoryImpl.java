@@ -1,9 +1,8 @@
 package com.example.vkr.auth.repository.impl;
 
-import com.example.vkr.auth.model.LockedToken;
+import com.example.vkr.auth.model.AuthToken;
 import com.example.vkr.auth.repository.TokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -13,22 +12,21 @@ import java.util.concurrent.TimeUnit;
 public class TokenRepositoryImpl implements TokenRepository {
 
     @Autowired
-    private RedisTemplate<String, LockedToken> redisTemplate;
+    private RedisTemplate<String, AuthToken> redisTokenTemplate;
 
 
     @Override
-    public void saveLockedToken(final LockedToken token) {
-        redisTemplate.opsForValue().set(token.getToken(), token, token.getExpiration(), TimeUnit.MILLISECONDS);
+    public void saveToken(final AuthToken authToken) {
+        redisTokenTemplate.opsForValue().set(authToken.getId(), authToken, authToken.getExpiration(), TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public LockedToken get(String key) {
-        return redisTemplate.opsForValue().get(key);
+    public AuthToken getAuthToken(String key) {
+        return redisTokenTemplate.opsForValue().get(key);
     }
 
     @Override
-    public boolean isBlockedList(String token) {
-        LockedToken lockedToken = redisTemplate.opsForValue().get(token);
-        return lockedToken == null;
+    public Boolean deleteByKey(String key) {
+        return redisTokenTemplate.delete(key);
     }
 }

@@ -1,20 +1,18 @@
 package com.example.vkr.auth.service.impl;
 
 import com.example.vkr.auth.model.AuthToken;
-import com.example.vkr.auth.model.LockedToken;
 import com.example.vkr.auth.repository.TokenRepository;
 import com.example.vkr.auth.service.TokenService;
 import com.example.vkr.config.TokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
 @Service(value = "tokenService")
 public class TokenServiceImpl implements TokenService {
-
-//    @Autowired
-//    private TokenRepository tokenRepository;
 
     @Autowired
     private TokenRepository tokensRepository;
@@ -23,26 +21,46 @@ public class TokenServiceImpl implements TokenService {
     private TokenProvider jwtTokenUtil;
 
     @Override
-    public void saveLockedToken(String token) {
+    public AuthToken saveToken(String token) {
+        Long expiration = getExpiration(token);
+        AuthToken authToken = new AuthToken(token, expiration);
+        String id = generateId(token);
+        authToken.setId(id);
+        tokensRepository.saveToken(authToken);
+        return authToken;
+    }
+
+    @Override
+    public Boolean deleteByToken(String token) {
+        String key = generateId(token);
+        return tokensRepository.deleteByKey(key);
+    }
+
+    @Override
+    public AuthToken refreshToken(String token) {
+        Boolean isDeleteToken = deleteByToken(token);
+        if (!isDeleteToken) {
+            return null;
+        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String newToken = jwtTokenUtil.generateToken(authentication);
+        return saveToken(newToken);
+    }
+
+    @Override
+    public AuthToken getAuthToken(String token) {
+        String id = generateId(token);
+        return tokensRepository.getAuthToken(id);
+    }
+
+    private String generateId(String token) {
         Date date = jwtTokenUtil.getExpirationDateFromToken(token);
-        System.out.println(date);
-        System.out.println(new Date());
-        Long expiration = new Date(date.getTime() - System.currentTimeMillis()).getTime();
-//        Long expiration = (date.getTime() - (new Date().getTime()));
-        LockedToken lockedToken = new LockedToken(token, expiration);
-        System.out.println(expiration);
-        tokensRepository.saveLockedToken(lockedToken);
-//        tokenRepository.save(lockedToken);
+        String userName = jwtTokenUtil.getUsernameFromToken(token);
+        return userName + "-" + date.getTime();
     }
 
-
-    @Override
-    public LockedToken findByToken(AuthToken token) {
-        return tokensRepository.get(token.getToken());
-    }
-
-    @Override
-    public boolean isBlackList(String token) {
-        return tokensRepository.get(token) != null;
+    private Long getExpiration(String token) {
+        Date date = jwtTokenUtil.getExpirationDateFromToken(token);
+        return new Date(date.getTime() - System.currentTimeMillis()).getTime();
     }
 }
