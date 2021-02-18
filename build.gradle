@@ -14,10 +14,11 @@ repositories {
 	mavenCentral()
 	maven { url 'https://repo.spring.io/milestone' }
 }
-/*
+
 ext {
 	set('springCloudVersion', "2020.0.0-M5")
-}*/
+	set('hibernateVersion', "5.4.24.Final")
+}
 
 dependencies {
 //	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
@@ -72,29 +73,21 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok:1.18.16'
 	annotationProcessor 'org.projectlombok:lombok:1.18.16'
 
-
-//	compile group: 'org.flywaydb', name: 'flyway-core', version: '7.4.0'
-
-
-//	compile group: 'com.zaxxer', name: 'HikariCP', version: '2.3.2'
-
 //	compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.4.24.Final'
-//	compile group: 'org.hibernate', name: 'hibernate-core', version: '5.4.24.Final'
-//	compile group: 'org.hibernate.javax.persistence', name: 'hibernate-jpa-2.0-api', version: '1.0.1.Final'
+	compile group: 'org.hibernate', name: 'hibernate-core', version: '5.4.24.Final'
+	compile group: 'org.hibernate', name: 'hibernate-gradle-plugin', version: '5.4.24.Final'
 //	compile group: 'org.hibernate', name: 'hibernate-c3p0', version: '4.1.0.Final'
 //	compile group: 'org.hibernate', name: 'hibernate-validator', version: '6.1.6.Final'
 //	compile group: 'org.hibernate.javax.persistence', name: 'hibernate-jpa-2.1-api', version: '1.0.2.Final'
 
-	//testCompile group: 'org.hsqldb', name: 'hsqldb', version: '2.5.1'
-
 	//test
 	testCompile group: 'org.assertj', name: 'assertj-core', version: '3.6.1'
 	//testCompile group: 'org.mockito', name: 'mockito-all', version: '2.0.2-beta'
-	testCompile group: 'com.h2database', name: 'h2', version: '1.4.200'
 
 	testCompile "org.mockito:mockito-core:2.24.0"
 	testCompile ("org.springframework.boot:spring-boot-starter-test") {
 		exclude group: "org.mockito", module: "mockito-all"
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
 	testCompile group: 'org.springframework.security', name: 'spring-security-test', version: '5.4.2'
 //	testCompile group: 'org.springframework', name: 'spring-test', version: '5.3.2'
@@ -108,30 +101,17 @@ dependencies {
 	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.7.0'
 	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.0'
 	testCompile group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.7.0'
+	testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.3.1'
 
 	testCompile group: 'io.takari.junit', name: 'takari-cpsuite', version: '1.2.7'
 
 }
-/*
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
-}
 
-
-flyway {
-	url = 'jdbc:postgresql://127.0.0.1:5432/test'
-	user = 'nikita'
-	password = 'Mityuhan1312'
-	locations = ['classpath:migrations']
-}
-*/
 test {
 	jvmArgs '--enable-preview'
 	useJUnitPlatform()
 }
 
 task testSuite(type: Test) {
-	include 'VkrApplicationTests.class'
+	include 'AbstractTest.class'
 }
