@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Repository("redisRepository")
@@ -28,5 +30,14 @@ public class TokenRepositoryImpl implements TokenRepository {
     @Override
     public Boolean deleteByKey(String key) {
         return redisTokenTemplate.delete(key);
+    }
+
+    @Override
+    public void deleteAllByUserName(String userName) {
+        Set<byte[]> byteKeys = redisTokenTemplate.getConnectionFactory().getConnection().keys(("*" + userName + "*").getBytes());
+        for (byte[] next : Objects.requireNonNull(byteKeys)) {
+            String key = new String(next, 0, next.length);
+            deleteByKey(key);
+        }
     }
 }

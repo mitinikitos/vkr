@@ -6,5 +6,6 @@ public interface TokenService {
     AuthToken saveToken(String token);
     AuthToken getAuthToken(String token);
     Boolean deleteByToken(String token);
+    void deleteAllTokenUser(String userName);
     AuthToken refreshToken(String token);
 }

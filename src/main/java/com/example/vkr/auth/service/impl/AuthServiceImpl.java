@@ -43,13 +43,7 @@ public class AuthServiceImpl implements AuthService {
     public AuthToken generateToken() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         final String token = jwtTokenUtil.generateToken(authentication);
-        tokenService.saveToken(token);
-        return new AuthToken(token);
-    }
-
-    public AuthToken refresh() {
-
-        return null;
+        return tokenService.saveToken(token);
     }
 
     @Override
@@ -115,6 +109,14 @@ public class AuthServiceImpl implements AuthService {
             throw new EntityNotFoundException("");
         }
         return optionalUser.get();
+    }
+
+    @Override
+    public void deleteUser() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = (String) authentication.getPrincipal();
+        tokenService.deleteAllTokenUser(userName);
+        deleteByName(userName);
     }
 
     @Override

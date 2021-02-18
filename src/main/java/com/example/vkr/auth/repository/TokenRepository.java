@@ -18,4 +18,5 @@ public interface TokenRepository {
      *
      */
     Boolean deleteByKey(String key);
+    void deleteAllByUserName(String userName);
 }

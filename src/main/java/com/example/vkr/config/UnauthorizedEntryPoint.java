@@ -16,6 +16,6 @@ public class UnauthorizedEntryPoint implements AuthenticationEntryPoint, Seriali
     @Override
     public void commence(HttpServletRequest req, HttpServletResponse res, AuthenticationException authException)
             throws IOException, ServletException {
-        res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+        res.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
     }
 }

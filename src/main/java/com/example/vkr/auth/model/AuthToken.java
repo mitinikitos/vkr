@@ -19,17 +19,18 @@ public class AuthToken implements Serializable {
     public static final long SerialVersionUID = 1L;
     @JsonView(View.REST.class)
     private String id;
-    private String token;
-    @JsonView(View.REST.class)
+    private String accessToken;
+    private String refreshToken;
     @TimeToLive(unit = TimeUnit.MILLISECONDS)
     private Long expiration;
+    private Long exp;
 
-    public AuthToken(String token, Long expiration) {
-        this.token = token;
+    public AuthToken(String accessToken, Long expiration) {
+        this.accessToken = accessToken;
         this.expiration = expiration;
     }
 
-    public AuthToken(String token) {
-        this.token = token;
+    public AuthToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 }

@@ -4,6 +4,7 @@ import com.example.vkr.auth.model.AuthToken;
 import com.example.vkr.auth.repository.TokenRepository;
 import com.example.vkr.auth.service.TokenService;
 import com.example.vkr.config.TokenProvider;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,26 +23,36 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public AuthToken saveToken(String token) {
-        Long expiration = getExpiration(token);
+        Date date = jwtTokenUtil.getExpirationDateFromToken(token);
+        Long expiration = getExpiration(token, date);
         AuthToken authToken = new AuthToken(token, expiration);
-        String id = generateId(token);
+        String id = generateId(token, date);
         authToken.setId(id);
+        authToken.setExpiration(expiration);
         tokensRepository.saveToken(authToken);
+        authToken.setExp(date.getTime());
         return authToken;
     }
 
     @Override
     public Boolean deleteByToken(String token) {
-        String key = generateId(token);
-        return tokensRepository.deleteByKey(key);
+        try {
+            Date date = jwtTokenUtil.getExpirationDateFromToken(token);
+            String key = generateId(token, date);
+            return tokensRepository.deleteByKey(key);
+        } catch (ExpiredJwtException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public void deleteAllTokenUser(String userName) {
+        tokensRepository.deleteAllByUserName(userName);
     }
 
     @Override
     public AuthToken refreshToken(String token) {
-        Boolean isDeleteToken = deleteByToken(token);
-        if (!isDeleteToken) {
-            return null;
-        }
+        deleteByToken(token);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String newToken = jwtTokenUtil.generateToken(authentication);
         return saveToken(newToken);
@@ -49,18 +60,21 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public AuthToken getAuthToken(String token) {
-        String id = generateId(token);
-        return tokensRepository.getAuthToken(id);
+        try {
+            Date date = jwtTokenUtil.getExpirationDateFromToken(token);
+            String id = generateId(token, date);
+            return tokensRepository.getAuthToken(id);
+        } catch (ExpiredJwtException e) {
+            return null;
+        }
     }
 
-    private String generateId(String token) {
-        Date date = jwtTokenUtil.getExpirationDateFromToken(token);
+    private String generateId(String token, Date date) {
         String userName = jwtTokenUtil.getUsernameFromToken(token);
         return userName + "-" + date.getTime();
     }
 
-    private Long getExpiration(String token) {
-        Date date = jwtTokenUtil.getExpirationDateFromToken(token);
+    private Long getExpiration(String token, Date date) {
         return new Date(date.getTime() - System.currentTimeMillis()).getTime();
     }
 }

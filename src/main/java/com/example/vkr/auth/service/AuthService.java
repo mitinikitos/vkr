@@ -46,6 +46,14 @@ public interface AuthService {
      * @return {@link AuthToken}
      */
     AuthToken generateToken();
-
+    /**
+     *
+     */
     User getProfile();
+    /**
+     * Delete {@link User}
+     * @throws EntityNotFoundException if {@link User} with given {@literal userName} not exists
+     * @throws BindingException if {@link Authentication} in {@code securityContext} is {@literal null}
+     */
+    void deleteUser();
 }

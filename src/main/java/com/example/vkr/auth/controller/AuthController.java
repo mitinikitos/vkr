@@ -6,7 +6,6 @@ import com.example.vkr.auth.model.LoginUser;
 import com.example.vkr.auth.model.User;
 import com.example.vkr.auth.model.UserDto;
 import com.example.vkr.auth.service.AuthService;
-import com.example.vkr.auth.service.TokenService;
 import com.example.vkr.exception.BindingException;
 import com.example.vkr.exception.EntityExistsException;
 import com.example.vkr.util.View;
@@ -35,14 +34,12 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private TokenService tokenService;
-
-    @Autowired
     private AuthService authService;
 
     /**
      *
      */
+    @JsonView(View.UI.class)
     @RequestMapping(value = "/signIn", method = RequestMethod.POST)
     public ResponseEntity<?> generateToken(@RequestBody @Validated(LoginUser.class) final LoginUser loginUser, BindingResult bindingResult)
             throws BindingException, AuthenticationException {
@@ -64,8 +61,7 @@ public class AuthController {
 
     @GetMapping("/logout")
     @PreAuthorize("hasRole('USER')")
-    public void logout() {
-    }
+    public void logout() {}
 
     @RequestMapping(value = "/signUp", method = RequestMethod.POST)
     public ResponseEntity<?> saveUser(@RequestBody UserDto userDto)
@@ -76,6 +72,7 @@ public class AuthController {
 
     @GetMapping("/refresh")
     @PreAuthorize("hasRole('USER')")
+    @JsonView(View.UI.class)
     public ResponseEntity<?> refresh(HttpServletRequest req) {
 //        final AuthToken authToken = authService.generateToken();
         final AuthToken authToken = (AuthToken) req.getAttribute("token");
@@ -84,9 +81,17 @@ public class AuthController {
 
     @GetMapping("/profile")
     @PreAuthorize("hasRole('USER')")
+    @JsonView(View.UI.class)
     public ResponseEntity<?> getProfile() {
+        User user = authService.getProfile();
+        return ResponseEntity.ok(user);
+    }
 
-        return null;
+    @DeleteMapping("/profile")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> deleteUser() {
+        authService.deleteUser();
+        return ResponseEntity.ok("Delete user success");
     }
 
     @PreAuthorize("hasRole('ADMIN')")

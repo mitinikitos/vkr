@@ -25,6 +25,7 @@ public class User {
             strategy = "org.hibernate.id.UUIDGenerator"
     )
     @Column(name = "id", columnDefinition = "uuid")
+    @JsonView(View.REST.class)
     private UUID id;
 
     @Column(name = "user_name", unique = true)
@@ -41,6 +42,7 @@ public class User {
     @Column(name = "email", unique = true)
     private String email;
 
+    @JsonView({View.REST.class})
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(name = "user_role",
             joinColumns = {
